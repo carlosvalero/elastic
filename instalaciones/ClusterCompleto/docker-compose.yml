@@ -11,62 +11,178 @@ services:
   # Maestro 1 #
   maestro1:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
-    container_name: nodo1
-#    ports: 
-#      - 8080:9200
-    volumes:
-      - /home/ubuntu/environment/datos/nodo1:/usr/share/elasticsearch/data
-    environment:
-      - node.name=maestro1
-      - cluster.name=MiCluster
-      - discovery.seed_hosts=maestro1,maestro2,data1,data2,data3,data4,ingesta1,ingesta2,cordinador1,cordinador2
-      - "ES_JAVA_OPTS=-Xms300m -Xmx300m"
-      - cluster.initial_master_nodes=maestro1,maestro2 # Limitar a todos los posibles maestros
-      - node.master: false 
-      - node.voting_only: false 
-      - node.data: false 
-      - node.ingest: false 
-      - node.remote_cluster_client: false  # cluster.remote.connect: false
-
-
-  # Maestro 2 #
-  maestro2:
-    image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
-    container_name: nodo1
+    container_name: maestro1
     ports: 
       - 8080:9200
     volumes:
       - /home/ubuntu/environment/datos/nodo1:/usr/share/elasticsearch/data
     environment:
-      - node.name=nodo1
+      - node.name=maestro1
       - cluster.name=MiCluster
-      - cluster.initial_master_nodes=maestro1,maestro2 # Limitar a todos los posibles maestros
-      - discovery.seed_hosts=nodo2,nodo3
+      - discovery.seed_hosts=maestro2,datos1,datos2,datos3,datos4,ingesta1,ingesta2,cordinador1,cordinador2
       - "ES_JAVA_OPTS=-Xms300m -Xmx300m"
+      - cluster.initial_master_nodes=maestro1,maestro2 # Limitar a todos los posibles maestros
+      - node.master=true 
+      - node.voting_only=false 
+      - node.data=false 
+      - node.ingest=false 
+      - node.remote_cluster_client=false  # cluster.remote.connect: false
 
-  nodo2:
+  # Maestro 2 #
+  maestro2:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
-    container_name: nodo2
+    container_name: maestro2
     volumes:
       - /home/ubuntu/environment/datos/nodo2:/usr/share/elasticsearch/data
     environment:
-      - node.name=nodo2
+      - node.name=maestro2
       - cluster.name=MiCluster
-      - cluster.initial_master_nodes=nodo1,nodo2,nodo3
-      - discovery.seed_hosts=nodo1,nodo3
+      - discovery.seed_hosts=maestro1,datos1,datos2,datos3,datos4,ingesta1,ingesta2,cordinador1,cordinador2
       - "ES_JAVA_OPTS=-Xms300m -Xmx300m"
+      - cluster.initial_master_nodes=maestro1,maestro2 # Limitar a todos los posibles maestros
+      - node.master=true 
+      - node.voting_only=false 
+      - node.data=false 
+      - node.ingest=false 
+      - node.remote_cluster_client=false  # cluster.remote.connect: false
 
-  nodo3:
+  # Data 1 #
+  datos1:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
-    container_name: nodo3
+    container_name: datos1
     volumes:
       - /home/ubuntu/environment/datos/nodo3:/usr/share/elasticsearch/data
     environment:
-      - node.name=nodo3
+      - node.name=datos1
       - cluster.name=MiCluster
-      - cluster.initial_master_nodes=nodo1,nodo2,nodo3
-      - discovery.seed_hosts=nodo1,nodo2
+      - discovery.seed_hosts=maestro1,maestro2,datos2,datos3,datos4,ingesta1,ingesta2,cordinador1,cordinador2
       - "ES_JAVA_OPTS=-Xms300m -Xmx300m"
+      - node.master=true 
+      - node.voting_only=true
+      - node.data=true 
+      - node.ingest=false 
+      - node.remote_cluster_client=false  # cluster.remote.connect: false
+
+  # Data 2 #
+  datos2:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+    container_name: datos2
+    volumes:
+      - /home/ubuntu/environment/datos/nodo4:/usr/share/elasticsearch/data
+    environment:
+      - node.name=datos2
+      - cluster.name=MiCluster
+      - discovery.seed_hosts=maestro1,maestro2,datos1,datos3,datos4,ingesta1,ingesta2,cordinador1,cordinador2
+      - "ES_JAVA_OPTS=-Xms300m -Xmx300m"
+      - node.master=false 
+      - node.voting_only=false 
+      - node.data=true 
+      - node.ingest=false 
+      - node.remote_cluster_client=false  # cluster.remote.connect: false
+
+  # Data 3 #
+  datos3:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+    container_name: datos3
+    volumes:
+      - /home/ubuntu/environment/datos/nodo5:/usr/share/elasticsearch/data
+    environment:
+      - node.name=datos3
+      - cluster.name=MiCluster
+      - discovery.seed_hosts=maestro1,maestro2,datos1,datos2,datos4,ingesta1,ingesta2,cordinador1,cordinador2
+      - "ES_JAVA_OPTS=-Xms300m -Xmx300m"
+      - node.master=false 
+      - node.voting_only=false 
+      - node.data=true 
+      - node.ingest=false 
+      - node.remote_cluster_client=false  # cluster.remote.connect: false
+      - node.attr.color=azul
+
+  # Data 4 #
+  datos4:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+    container_name: datos4
+    volumes:
+      - /home/ubuntu/environment/datos/nodo6:/usr/share/elasticsearch/data
+    environment:
+      - node.name=datos4
+      - cluster.name=MiCluster
+      - discovery.seed_hosts=maestro1,maestro2,datos1,datos2,datos3,ingesta1,ingesta2,cordinador1,cordinador2
+      - "ES_JAVA_OPTS=-Xms300m -Xmx300m"
+      - node.master=false 
+      - node.voting_only=false 
+      - node.data=true 
+      - node.ingest=false 
+      - node.remote_cluster_client=false  # cluster.remote.connect: false
+      - node.attr.color=["azul","verde"]
+
+  # Ingesta 1 #
+  ingesta1:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+    container_name: ingesta1
+    volumes:
+      - /home/ubuntu/environment/datos/nodo7:/usr/share/elasticsearch/data
+    environment:
+      - node.name=ingesta1
+      - cluster.name=MiCluster
+      - discovery.seed_hosts=maestro1,maestro2,datos1,datos2,datos3,datos4,ingesta2,cordinador1,cordinador2
+      - "ES_JAVA_OPTS=-Xms300m -Xmx300m"
+      - node.master=false 
+      - node.voting_only=false 
+      - node.data=false 
+      - node.ingest=true
+      - node.remote_cluster_client=false  # cluster.remote.connect: false
+
+  # Ingesta 2 #
+  ingesta2:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+    container_name: ingesta2
+    volumes:
+      - /home/ubuntu/environment/datos/nodo8:/usr/share/elasticsearch/data
+    environment:
+      - node.name=ingesta2
+      - cluster.name=MiCluster
+      - discovery.seed_hosts=maestro1,maestro2,datos1,datos2,datos3,datos4,ingesta1,cordinador1,cordinador2
+      - "ES_JAVA_OPTS=-Xms300m -Xmx300m"
+      - node.master=false 
+      - node.voting_only=false 
+      - node.data=false 
+      - node.ingest=true
+      - node.remote_cluster_client=false  # cluster.remote.connect: false
+
+  # Cordinador 1 #
+  cordinador1:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+    container_name: cordinador1
+    volumes:
+      - /home/ubuntu/environment/datos/nodo9:/usr/share/elasticsearch/data
+    environment:
+      - node.name=cordinador1
+      - cluster.name=MiCluster
+      - discovery.seed_hosts=maestro1,maestro2,datos1,datos2,datos3,datos4,ingesta1,ingesta2,cordinador2
+      - "ES_JAVA_OPTS=-Xms300m -Xmx300m"
+      - node.master=false 
+      - node.voting_only=false 
+      - node.data=false 
+      - node.ingest=false
+      - node.remote_cluster_client=false  # cluster.remote.connect: false
+
+  # Cordinador 2 #
+  cordinador2:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+    container_name: cordinador2
+    volumes:
+      - /home/ubuntu/environment/datos/nodo10:/usr/share/elasticsearch/data
+    environment:
+      - node.name=cordinador2
+      - cluster.name=MiCluster
+      - discovery.seed_hosts=maestro1,maestro2,datos1,datos2,datos3,datos4,ingesta1,ingesta2,cordinador1
+      - "ES_JAVA_OPTS=-Xms300m -Xmx300m"
+      - node.master=false 
+      - node.voting_only=false 
+      - node.data=false 
+      - node.ingest=false
+      - node.remote_cluster_client=false  # cluster.remote.connect: false
 
   cerebro:
     image: lmenezes/cerebro:0.8.5
@@ -82,7 +198,7 @@ services:
     ports: 
       - 8082:5601
     environment:
-      ELASTICSEARCH_HOSTS: "http://nodo1:9200"
+      ELASTICSEARCH_HOSTS: "http://maestro1:9200"
       SERVER_NAME: "kibana"
       SERVER_HOST: "kibana"
   
