@@ -1,0 +1,301 @@
+version: '3.0'
+services:
+
+# 2 Maestros
+# 4 datas (1 votación)
+# 2 ingestas
+# 2 cordinadores
+# ------
+# 10 Nodos
+
+  # Maestro 1 #
+  maestro1:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+    container_name: maestro1
+    ports: 
+      - 8080:9200
+    volumes:
+      - /home/ubuntu/environment/datos/nodo1:/usr/share/elasticsearch/data
+      - /home/ubuntu/environment/datos/certs/maestro1:/usr/share/elasticsearch/config/certificates/own
+      - /home/ubuntu/environment/datos/certs/ca:/usr/share/elasticsearch/config/certificates/ca
+    networks:
+      - backnet
+    environment:
+      - node.name=maestro1
+      - cluster.name=MiCluster
+      - discovery.seed_hosts=maestro2,datos1,datos2,datos3,datos4,ingesta1,ingesta2,cordinador1,cordinador2
+      - "ES_JAVA_OPTS=-Xms300m -Xmx300m"
+      - cluster.initial_master_nodes=maestro1,maestro2 # Limitar a todos los posibles maestros
+      - node.master=true 
+      - node.voting_only=false 
+      - node.data=false 
+      - node.ingest=false 
+      - node.remote_cluster_client=false  # cluster.remote.connect: false
+
+  # Maestro 2 #
+  maestro2:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+    container_name: maestro2
+    volumes:
+      - /home/ubuntu/environment/datos/nodo2:/usr/share/elasticsearch/data
+      - /home/ubuntu/environment/datos/certs/maestro2:/usr/share/elasticsearch/config/certificates/own
+      - /home/ubuntu/environment/datos/certs/ca:/usr/share/elasticsearch/config/certificates/ca
+    networks:
+      - backnet
+    environment:
+      - node.name=maestro2
+      - cluster.name=MiCluster
+      - discovery.seed_hosts=maestro1,datos1,datos2,datos3,datos4,ingesta1,ingesta2,cordinador1,cordinador2
+      - "ES_JAVA_OPTS=-Xms300m -Xmx300m"
+      - cluster.initial_master_nodes=maestro1,maestro2 # Limitar a todos los posibles maestros
+      - node.master=true 
+      - node.voting_only=false 
+      - node.data=false 
+      - node.ingest=false 
+      - node.remote_cluster_client=false  # cluster.remote.connect: false
+
+  # Data 1 #
+  datos1:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+    container_name: datos1
+    volumes:
+      - /home/ubuntu/environment/datos/nodo3:/usr/share/elasticsearch/data
+      - /home/ubuntu/environment/datos/certs/datos1:/usr/share/elasticsearch/config/certificates/own
+      - /home/ubuntu/environment/datos/certs/ca:/usr/share/elasticsearch/config/certificates/ca
+    networks:
+      - backnet
+    environment:
+      - node.name=datos1
+      - cluster.name=MiCluster
+      - discovery.seed_hosts=maestro1,maestro2,datos2,datos3,datos4,ingesta1,ingesta2,cordinador1,cordinador2
+      - "ES_JAVA_OPTS=-Xms300m -Xmx300m"
+      - node.master=true 
+      - node.voting_only=true
+      - node.data=true 
+      - node.ingest=false 
+      - node.remote_cluster_client=false  # cluster.remote.connect: false
+
+  # Data 2 #
+  datos2:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+    container_name: datos2
+    volumes:
+      - /home/ubuntu/environment/datos/nodo4:/usr/share/elasticsearch/data
+      - /home/ubuntu/environment/datos/certs/datos2:/usr/share/elasticsearch/config/certificates/own
+      - /home/ubuntu/environment/datos/certs/ca:/usr/share/elasticsearch/config/certificates/ca
+    networks:
+      - backnet
+    environment:
+      - node.name=datos2
+      - cluster.name=MiCluster
+      - discovery.seed_hosts=maestro1,maestro2,datos1,datos3,datos4,ingesta1,ingesta2,cordinador1,cordinador2
+      - "ES_JAVA_OPTS=-Xms300m -Xmx300m"
+      - node.master=false 
+      - node.voting_only=false 
+      - node.data=true 
+      - node.ingest=false 
+      - node.remote_cluster_client=false  # cluster.remote.connect: false
+
+  # Data 3 #
+  datos3:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+    container_name: datos3
+    volumes:
+      - /home/ubuntu/environment/datos/nodo5:/usr/share/elasticsearch/data
+      - /home/ubuntu/environment/datos/certs/datos3:/usr/share/elasticsearch/config/certificates/own
+      - /home/ubuntu/environment/datos/certs/ca:/usr/share/elasticsearch/config/certificates/ca
+    networks:
+      - backnet
+    environment:
+      - node.name=datos3
+      - cluster.name=MiCluster
+      - discovery.seed_hosts=maestro1,maestro2,datos1,datos2,datos4,ingesta1,ingesta2,cordinador1,cordinador2
+      - "ES_JAVA_OPTS=-Xms300m -Xmx300m"
+      - node.master=false 
+      - node.voting_only=false 
+      - node.data=true 
+      - node.ingest=false 
+      - node.remote_cluster_client=false  # cluster.remote.connect: false
+      - node.attr.color=azul
+
+  # Data 4 #
+  datos4:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+    container_name: datos4
+    volumes:
+      - /home/ubuntu/environment/datos/nodo6:/usr/share/elasticsearch/data
+      - /home/ubuntu/environment/datos/certs/datos4:/usr/share/elasticsearch/config/certificates/own
+      - /home/ubuntu/environment/datos/certs/ca:/usr/share/elasticsearch/config/certificates/ca
+    networks:
+      - backnet
+    environment:
+      - node.name=datos4
+      - cluster.name=MiCluster
+      - discovery.seed_hosts=maestro1,maestro2,datos1,datos2,datos3,ingesta1,ingesta2,cordinador1,cordinador2
+      - "ES_JAVA_OPTS=-Xms300m -Xmx300m"
+      - node.master=false 
+      - node.voting_only=false 
+      - node.data=true 
+      - node.ingest=false 
+      - node.remote_cluster_client=false  # cluster.remote.connect: false
+      - node.attr.color=["azul","verde"]
+
+  # Ingesta 1 #
+  ingesta1:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+    container_name: ingesta1
+    volumes:
+      - /home/ubuntu/environment/datos/nodo7:/usr/share/elasticsearch/data
+      - /home/ubuntu/environment/datos/certs/ingesta1:/usr/share/elasticsearch/config/certificates/own
+      - /home/ubuntu/environment/datos/certs/ca:/usr/share/elasticsearch/config/certificates/ca
+    networks:
+      - backnet
+      - frontnet
+    environment:
+      - transport.host=_eth0_
+      - node.name=ingesta1
+      - cluster.name=MiCluster
+      - discovery.seed_hosts=maestro1,maestro2,datos1,datos2,datos3,datos4,ingesta2,cordinador1,cordinador2
+      - "ES_JAVA_OPTS=-Xms300m -Xmx300m"
+      - node.master=false 
+      - node.voting_only=false 
+      - node.data=false 
+      - node.ingest=true
+      - node.remote_cluster_client=false  # cluster.remote.connect: false
+
+  # Ingesta 2 #
+  ingesta2:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+    container_name: ingesta2
+    volumes:
+      - /home/ubuntu/environment/datos/nodo8:/usr/share/elasticsearch/data
+      - /home/ubuntu/environment/datos/certs/ingesta2:/usr/share/elasticsearch/config/certificates/own
+      - /home/ubuntu/environment/datos/certs/ca:/usr/share/elasticsearch/config/certificates/ca
+    networks:
+      - backnet
+      - frontnet
+    environment:
+      - transport.host=_eth0_
+      - node.name=ingesta2
+      - cluster.name=MiCluster
+      - discovery.seed_hosts=maestro1,maestro2,datos1,datos2,datos3,datos4,ingesta1,cordinador1,cordinador2
+      - "ES_JAVA_OPTS=-Xms300m -Xmx300m"
+      - node.master=false 
+      - node.voting_only=false 
+      - node.data=false 
+      - node.ingest=true
+      - node.remote_cluster_client=false  # cluster.remote.connect: false
+
+  # Cordinador 1 #
+  cordinador1:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+    container_name: cordinador1
+    volumes:
+      - /home/ubuntu/environment/datos/nodo9:/usr/share/elasticsearch/data
+      - /home/ubuntu/environment/datos/certs/cordinador1:/usr/share/elasticsearch/config/certificates/own
+      - /home/ubuntu/environment/datos/certs/ca:/usr/share/elasticsearch/config/certificates/ca
+    networks:
+      - backnet
+      - frontnet
+    environment:
+      - transport.host=_eth0_
+      - node.name=cordinador1
+      - cluster.name=MiCluster
+      - discovery.seed_hosts=maestro1,maestro2,datos1,datos2,datos3,datos4,ingesta1,ingesta2,cordinador2
+      - "ES_JAVA_OPTS=-Xms300m -Xmx300m"
+      - node.master=false 
+      - node.voting_only=false 
+      - node.data=false 
+      - node.ingest=false
+      - node.remote_cluster_client=false  # cluster.remote.connect: false
+
+  # Cordinador 2 #
+  cordinador2:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+    container_name: cordinador2
+    volumes:
+      - /home/ubuntu/environment/datos/nodo10:/usr/share/elasticsearch/data
+      - /home/ubuntu/environment/datos/certs/cordinador2:/usr/share/elasticsearch/config/certificates/own
+      - /home/ubuntu/environment/datos/certs/ca:/usr/share/elasticsearch/config/certificates/ca
+    networks:
+      - backnet
+      - frontnet
+    environment:
+      - transport.host=_eth0_
+      - node.name=cordinador2
+      - cluster.name=MiCluster
+      - discovery.seed_hosts=maestro1,maestro2,datos1,datos2,datos3,datos4,ingesta1,ingesta2,cordinador1
+      - "ES_JAVA_OPTS=-Xms300m -Xmx300m"
+      - node.master=false 
+      - node.voting_only=false 
+      - node.data=false 
+      - node.ingest=false
+      - node.remote_cluster_client=false  # cluster.remote.connect: false
+
+  cerebro:
+    image: lmenezes/cerebro:0.8.5
+    container_name: cerebro
+    ports: 
+      - 8081:9000
+    volumes:
+      - ./application.conf:/opt/cerebro/conf/application.conf
+    networks:
+      - frontnet
+  
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.7.0
+    container_name: kibana
+    ports: 
+      - 8082:5601
+    volumes:
+      - /home/ubuntu/environment/datos/certs/kibana:/usr/share/kibana/config/certificates/own
+      - /home/ubuntu/environment/datos/certs/ca:/usr/share/kibana/config/certificates/ca
+    networks:
+      - frontnet
+    environment:
+      ELASTICSEARCH_HOSTS: "http://maestro1:9200"
+      SERVER_NAME: "kibana"
+      SERVER_HOST: "kibana"
+      
+  create_certs:
+    container_name: create_certs
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
+    command: >
+      bash -c '
+        if [[ ! -f /certs/bundle.zip ]]; then
+          bin/elasticsearch-certutil cert --silent --pem --in config/certificates/instances.yml -out /certs/bundle.zip;
+          chown -R 1000:0 /certs
+        fi
+      '
+    user: "0"
+    working_dir: /usr/share/elasticsearch
+    volumes: 
+      - 'certsroot:/certs'
+      - '.:/usr/share/elasticsearch/config/certificates'
+
+volumes:
+  certsroot:
+    driver: local
+    driver_opts:
+      type: 'none'
+      o: 'bind'
+      device: '/home/ubuntu/environment/datos/certs'
+
+networks:
+  backnet:
+    ipam:
+      driver: default
+      config:
+        - subnet: 10.10.0.0/8
+
+  frontnet:
+    ipam:
+      driver: default
+      config:
+        - subnet: 20.10.0.0/8
+
+  publicnet:
+    ipam:
+      driver: default
+      config:
+        - subnet: 30.10.0.0/8

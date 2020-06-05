@@ -2,33 +2,49 @@ version: '3.0'
 services:
 
 # 2 Maestros
-# 4 datas (1 votación)
+# 4 datas (1 votacion)
 # 2 ingestas
-# 2 cordinadores
-# ------
+# 2 coordinadores
+# -------
 # 10 Nodos
+  
+  # maestro1
+  # maestro2
+  # ingesta1
+  # ingesta2
+  # coordinador1
+  # coordinador2
+  # data1
+  # data2
+  # data3
+  # data4
+  
 
-  # Maestro 1 #
+# 3 redes 
+# Securizar HTTPS
+
   maestro1:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
     container_name: maestro1
-    ports: 
+    ports:
       - 8080:9200
     volumes:
       - /home/ubuntu/environment/datos/nodo1:/usr/share/elasticsearch/data
     environment:
       - node.name=maestro1
       - cluster.name=MiCluster
-      - discovery.seed_hosts=maestro2,datos1,datos2,datos3,datos4,ingesta1,ingesta2,cordinador1,cordinador2
-      - "ES_JAVA_OPTS=-Xms300m -Xmx300m"
-      - cluster.initial_master_nodes=maestro1,maestro2 # Limitar a todos los posibles maestros
-      - node.master=true 
+      - discovery.seed_hosts=maestro2
+      - cluster.initial_master_nodes=maestro1,maestro2 # Limitar a TODOS los posibles maestro
+      - "ES_JAVA_OPTS=-Xms220m -Xmx220m"
+#      - bootstrap.memory_lock=true # Desactivar el swapping para la memoria de elastic
+      - node.master=true
       - node.voting_only=false 
       - node.data=false 
       - node.ingest=false 
-      - node.remote_cluster_client=false  # cluster.remote.connect: false
+      - node.remote_cluster_client=false  # cluster.remote.connect: false 
+          
+          
 
-  # Maestro 2 #
   maestro2:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
     container_name: maestro2
@@ -37,86 +53,88 @@ services:
     environment:
       - node.name=maestro2
       - cluster.name=MiCluster
-      - discovery.seed_hosts=maestro1,datos1,datos2,datos3,datos4,ingesta1,ingesta2,cordinador1,cordinador2
-      - "ES_JAVA_OPTS=-Xms300m -Xmx300m"
-      - cluster.initial_master_nodes=maestro1,maestro2 # Limitar a todos los posibles maestros
-      - node.master=true 
+      - discovery.seed_hosts=maestro1
+      - cluster.initial_master_nodes=maestro1,maestro2 # Limitar a TODOS los posibles maestro
+      - "ES_JAVA_OPTS=-Xms220m -Xmx220m"
+#      - bootstrap.memory_lock=true # Desactivar el swapping para la memoria de elastic
+      - node.master=true
       - node.voting_only=false 
       - node.data=false 
       - node.ingest=false 
-      - node.remote_cluster_client=false  # cluster.remote.connect: false
-
-  # Data 1 #
-  datos1:
+      - node.remote_cluster_client=false  # cluster.remote.connect: false 
+          
+          
+  data1:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
-    container_name: datos1
+    container_name: data1
     volumes:
       - /home/ubuntu/environment/datos/nodo3:/usr/share/elasticsearch/data
     environment:
-      - node.name=datos1
+      - node.name=data1
       - cluster.name=MiCluster
-      - discovery.seed_hosts=maestro1,maestro2,datos2,datos3,datos4,ingesta1,ingesta2,cordinador1,cordinador2
-      - "ES_JAVA_OPTS=-Xms300m -Xmx300m"
-      - node.master=true 
-      - node.voting_only=true
+      - discovery.seed_hosts=maestro1,maestro2
+      - "ES_JAVA_OPTS=-Xms220m -Xmx220m"
+#      - bootstrap.memory_lock=true # Desactivar el swapping para la memoria de elastic
+      - node.master=true
+      - node.voting_only=true 
       - node.data=true 
       - node.ingest=false 
-      - node.remote_cluster_client=false  # cluster.remote.connect: false
+      - node.remote_cluster_client=false  # cluster.remote.connect: false 
 
-  # Data 2 #
-  datos2:
+  data2:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
-    container_name: datos2
+    container_name: data2
     volumes:
       - /home/ubuntu/environment/datos/nodo4:/usr/share/elasticsearch/data
     environment:
-      - node.name=datos2
+      - node.name=data2
       - cluster.name=MiCluster
-      - discovery.seed_hosts=maestro1,maestro2,datos1,datos3,datos4,ingesta1,ingesta2,cordinador1,cordinador2
-      - "ES_JAVA_OPTS=-Xms300m -Xmx300m"
-      - node.master=false 
+      - discovery.seed_hosts=maestro1,maestro2
+      - "ES_JAVA_OPTS=-Xms220m -Xmx220m"
+#      - bootstrap.memory_lock=true # Desactivar el swapping para la memoria de elastic
+      - node.master=false
       - node.voting_only=false 
       - node.data=true 
       - node.ingest=false 
-      - node.remote_cluster_client=false  # cluster.remote.connect: false
-
-  # Data 3 #
-  datos3:
+      - node.remote_cluster_client=false  # cluster.remote.connect: false 
+          
+  data3:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
-    container_name: datos3
+    container_name: data3
     volumes:
       - /home/ubuntu/environment/datos/nodo5:/usr/share/elasticsearch/data
     environment:
-      - node.name=datos3
+      - node.name=data3
       - cluster.name=MiCluster
-      - discovery.seed_hosts=maestro1,maestro2,datos1,datos2,datos4,ingesta1,ingesta2,cordinador1,cordinador2
-      - "ES_JAVA_OPTS=-Xms300m -Xmx300m"
-      - node.master=false 
+      - discovery.seed_hosts=maestro1,maestro2
+      - "ES_JAVA_OPTS=-Xms220m -Xmx220m"
+#      - bootstrap.memory_lock=true # Desactivar el swapping para la memoria de elastic
+      - node.master=false
       - node.voting_only=false 
       - node.data=true 
       - node.ingest=false 
-      - node.remote_cluster_client=false  # cluster.remote.connect: false
+      - node.remote_cluster_client=false  # cluster.remote.connect: false 
       - node.attr.color=azul
-
-  # Data 4 #
-  datos4:
+          
+  data4:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
-    container_name: datos4
+    container_name: data4
     volumes:
       - /home/ubuntu/environment/datos/nodo6:/usr/share/elasticsearch/data
     environment:
-      - node.name=datos4
+      - node.name=data4
       - cluster.name=MiCluster
-      - discovery.seed_hosts=maestro1,maestro2,datos1,datos2,datos3,ingesta1,ingesta2,cordinador1,cordinador2
-      - "ES_JAVA_OPTS=-Xms300m -Xmx300m"
-      - node.master=false 
+      - discovery.seed_hosts=maestro1,maestro2
+      - "ES_JAVA_OPTS=-Xms220m -Xmx220m"
+#      - bootstrap.memory_lock=true # Desactivar el swapping para la memoria de elastic
+      - node.master=false
       - node.voting_only=false 
       - node.data=true 
       - node.ingest=false 
-      - node.remote_cluster_client=false  # cluster.remote.connect: false
-      - node.attr.color=["azul","verde"]
+      - node.remote_cluster_client=false  # cluster.remote.connect: false 
+      - node.attr.color=azul,verde
 
-  # Ingesta 1 #
+          
   ingesta1:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
     container_name: ingesta1
@@ -125,15 +143,16 @@ services:
     environment:
       - node.name=ingesta1
       - cluster.name=MiCluster
-      - discovery.seed_hosts=maestro1,maestro2,datos1,datos2,datos3,datos4,ingesta2,cordinador1,cordinador2
-      - "ES_JAVA_OPTS=-Xms300m -Xmx300m"
-      - node.master=false 
+      - discovery.seed_hosts=maestro1,maestro2
+      - "ES_JAVA_OPTS=-Xms220m -Xmx220m"
+#      - bootstrap.memory_lock=true # Desactivar el swapping para la memoria de elastic
+      - node.master=false
       - node.voting_only=false 
       - node.data=false 
-      - node.ingest=true
-      - node.remote_cluster_client=false  # cluster.remote.connect: false
-
-  # Ingesta 2 #
+      - node.ingest=true 
+      - node.remote_cluster_client=false  # cluster.remote.connect: false 
+          
+          
   ingesta2:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
     container_name: ingesta2
@@ -142,63 +161,68 @@ services:
     environment:
       - node.name=ingesta2
       - cluster.name=MiCluster
-      - discovery.seed_hosts=maestro1,maestro2,datos1,datos2,datos3,datos4,ingesta1,cordinador1,cordinador2
-      - "ES_JAVA_OPTS=-Xms300m -Xmx300m"
-      - node.master=false 
+      - discovery.seed_hosts=maestro1,maestro2
+      - "ES_JAVA_OPTS=-Xms220m -Xmx220m"
+#      - bootstrap.memory_lock=true # Desactivar el swapping para la memoria de elastic
+      - node.master=false
       - node.voting_only=false 
       - node.data=false 
-      - node.ingest=true
-      - node.remote_cluster_client=false  # cluster.remote.connect: false
-
-  # Cordinador 1 #
-  cordinador1:
+      - node.ingest=true 
+      - node.remote_cluster_client=false  # cluster.remote.connect: false 
+          
+          
+  coordinador1:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
-    container_name: cordinador1
+    container_name: coordinador1
     volumes:
       - /home/ubuntu/environment/datos/nodo9:/usr/share/elasticsearch/data
     environment:
-      - node.name=cordinador1
+      - node.name=coordinador1
       - cluster.name=MiCluster
-      - discovery.seed_hosts=maestro1,maestro2,datos1,datos2,datos3,datos4,ingesta1,ingesta2,cordinador2
-      - "ES_JAVA_OPTS=-Xms300m -Xmx300m"
-      - node.master=false 
+      - discovery.seed_hosts=maestro1,maestro2
+      - "ES_JAVA_OPTS=-Xms220m -Xmx220m"
+#      - bootstrap.memory_lock=true # Desactivar el swapping para la memoria de elastic
+      - node.master=false
       - node.voting_only=false 
       - node.data=false 
-      - node.ingest=false
-      - node.remote_cluster_client=false  # cluster.remote.connect: false
-
-  # Cordinador 2 #
-  cordinador2:
+      - node.ingest=false 
+      - node.remote_cluster_client=false  # cluster.remote.connect: false 
+          
+          
+  coordinador2:
     image: docker.elastic.co/elasticsearch/elasticsearch:7.7.0
-    container_name: cordinador2
+    container_name: coordinador2
     volumes:
       - /home/ubuntu/environment/datos/nodo10:/usr/share/elasticsearch/data
     environment:
-      - node.name=cordinador2
+      - node.name=coordinador2
       - cluster.name=MiCluster
-      - discovery.seed_hosts=maestro1,maestro2,datos1,datos2,datos3,datos4,ingesta1,ingesta2,cordinador1
-      - "ES_JAVA_OPTS=-Xms300m -Xmx300m"
-      - node.master=false 
+      - discovery.seed_hosts=maestro1,maestro2
+      - "ES_JAVA_OPTS=-Xms220m -Xmx220m"
+#      - bootstrap.memory_lock=true # Desactivar el swapping para la memoria de elastic
+      - node.master=false
       - node.voting_only=false 
       - node.data=false 
-      - node.ingest=false
-      - node.remote_cluster_client=false  # cluster.remote.connect: false
+      - node.ingest=false 
+      - node.remote_cluster_client=false  # cluster.remote.connect: false 
+          
 
+
+          
   cerebro:
     image: lmenezes/cerebro:0.8.5
     container_name: cerebro
-    ports: 
+    ports:
       - 8081:9000
     volumes:
       - ./application.conf:/opt/cerebro/conf/application.conf
-  
+
   kibana:
     image: docker.elastic.co/kibana/kibana:7.7.0
     container_name: kibana
-    ports: 
+    ports:
       - 8082:5601
     environment:
-      ELASTICSEARCH_HOSTS: "http://maestro1:9200"
+      ELASTICSEARCH_HOSTS: "http://coordinador1:9200"
       SERVER_NAME: "kibana"
       SERVER_HOST: "kibana"
-  
